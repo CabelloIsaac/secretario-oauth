@@ -1,0 +1,38 @@
+<!doctype html>
+<!--
+  Puente OAuth de Slack para el Secretario.
+  Slack solo acepta redirects HTTPS; esta página estática (p. ej. en GitHub Pages) recibe ?code=&state= y los reenvía
+  a la app que corre en tu equipo (http://127.0.0.1:8765). No guarda ni envía nada a ningún otro sitio, y el `code`
+  no sirve sin el client secret, que solo está en el llavero de tu equipo.
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Conectando con el Secretario…</title>
+<style>
+  body { font: 16px -apple-system, "Segoe UI", sans-serif; display: grid; place-items: center; height: 90vh; margin: 0;
+         background: #f6f7f9; color: #16181d; }
+  @media (prefers-color-scheme: dark) { body { background: #111317; color: #e8eaee; } }
+  a { color: #3b5bdb; }
+</style>
+</head>
+<body>
+<div style="text-align:center;padding:16px">
+  <h2>Conectando Slack con tu Secretario…</h2>
+  <p id="m">Si no pasa nada en unos segundos, comprueba que la app está abierta en este equipo.</p>
+</div>
+<script>
+  const q = new URLSearchParams(location.search);
+  const ok = /^[\w.\-]+$/.test(q.get("state") || "") && (/^[\w.\-]+$/.test(q.get("code") || "") || q.get("error"));
+  if (ok) {
+    const destino = new URL("http://127.0.0.1:8765/oauth/slack/callback");
+    for (const k of ["code", "state", "error"]) if (q.get(k)) destino.searchParams.set(k, q.get(k));
+    location.replace(destino.toString());
+  } else {
+    document.getElementById("m").textContent = "Enlace incompleto. Vuelve a la app y pulsa «Conectar con Slack».";
+  }
+</script>
+</body>
+</html>
